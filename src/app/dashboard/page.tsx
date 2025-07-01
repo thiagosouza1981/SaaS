@@ -29,15 +29,20 @@ export default function DashboardPage() {
   // Fetch user and clients
   useEffect(() => {
     const getUserAndClients = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-      if (userError || !user) {
+        if (userError || !user) {
+          router.push("/login");
+          return;
+        }
+        setUser(user);
+
+        await fetchClients();
+      } catch (error) {
+        console.error("Erro ao buscar usuário:", error);
         router.push("/login");
-        return;
       }
-      setUser(user);
-
-      fetchClients();
     };
     getUserAndClients();
   }, [supabase, router]);
@@ -45,23 +50,37 @@ export default function DashboardPage() {
   // Fetch clients
   const fetchClients = async () => {
     setLoading(true);
-    const { data: clientsData, error: clientsError } = await supabase
-      .from("clients")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const { data: clientsData, error: clientsError } = await supabase
+        .from("clients")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (clientsError) {
-      console.error("Erro ao buscar clientes:", clientsError);
-    } else {
-      setClients(clientsData || []);
+      if (clientsError) {
+        console.error("Erro ao buscar clientes:", clientsError);
+        setClients([]);
+      } else {
+        // Garantir que clientsData é um array
+        const safeClientsData = Array.isArray(clientsData) ? clientsData : [];
+        setClients(safeClientsData);
+      }
+    } catch (error) {
+      console.error("Erro inesperado ao buscar clientes:", error);
+      setClients([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Handle sign out
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
+    try {
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      router.push("/login");
+    }
   };
 
   // Edit client

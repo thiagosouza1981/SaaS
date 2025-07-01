@@ -29,7 +29,10 @@ export function ClientsTable({
   onEdit,
   onDelete,
 }: ClientsTableProps) {
-  if (clients.length === 0) {
+  // Garantir que clients é sempre um array
+  const safeClients = Array.isArray(clients) ? clients : [];
+
+  if (safeClients.length === 0) {
     return (
       <div className="border-2 border-dashed border-gray-200 rounded-lg h-64 flex items-center justify-center">
         <p className="text-gray-500">Nenhum cliente cadastrado ainda.</p>
@@ -51,7 +54,7 @@ export function ClientsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {clients.map((client) => (
+          {safeClients.map((client) => (
             <TableRow key={client.id}>
               <TableCell className="font-medium">{client.name}</TableCell>
               <TableCell className="hidden sm:table-cell">
