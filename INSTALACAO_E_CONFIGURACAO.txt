@@ -1,0 +1,143 @@
+# SISTEMA DE GERENCIAMENTO DE CLIENTES - INSTRUÇÕES DE INSTALAÇÃO E CONFIGURAÇÃO
+
+## REQUISITOS DO SISTEMA
+
+- Node.js 18.x ou superior
+- npm, pnpm ou yarn
+- Conta no Supabase (gratuita)
+
+## CONFIGURAÇÃO DO SUPABASE
+
+1. Acesse https://supabase.com e faça login ou crie uma conta
+2. Crie um novo projeto
+3. Copie sua URL e chave anônima (anon key) nas configurações do projeto
+4. Execute os seguintes comandos SQL no editor SQL do Supabase:
+
+```sql
+-- Criar a tabela de clientes
+CREATE TABLE IF NOT EXISTS public.clients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Habilitar RLS (Row Level Security)
+ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+
+-- Criar políticas de segurança
+CREATE POLICY "Usuários podem visualizar seus próprios clientes" 
+ON public.clients FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Usuários podem inserir seus próprios clientes" 
+ON public.clients FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Usuários podem atualizar seus próprios clientes" 
+ON public.clients FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Usuários podem deletar seus próprios clientes" 
+ON public.clients FOR DELETE USING (auth.uid() = user_id);
+```
+
+5. Configure a autenticação no painel do Supabase:
+   - Vá para Authentication > Providers
+   - Ative Email/Password
+   - Opcionalmente, configure outros provedores como Google, Facebook, etc.
+
+## INSTALAÇÃO LOCAL
+
+1. Clone o repositório:
+   ```
+   git clone [URL_DO_REPOSITORIO]
+   cd [NOME_DO_REPOSITORIO]
+   ```
+
+2. Instale as dependências:
+   ```
+   npm install
+   # ou
+   pnpm install
+   # ou
+   yarn install
+   ```
+
+3. Configure as variáveis de ambiente:
+   - Crie um arquivo `.env.local` na raiz do projeto com:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
+   ```
+
+4. Inicie o servidor de desenvolvimento:
+   ```
+   npm run dev
+   # ou
+   pnpm dev
+   # ou
+   yarn dev
+   ```
+
+5. Acesse a aplicação em http://localhost:3000
+
+## DEPLOY PARA PRODUÇÃO
+
+### Deploy na Vercel (recomendado)
+
+1. Faça push do seu código para um repositório GitHub, GitLab ou Bitbucket
+2. Acesse https://vercel.com e faça login
+3. Clique em "New Project" e importe seu repositório
+4. Configure as variáveis de ambiente:
+   - NEXT_PUBLIC_SUPABASE_URL
+   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+5. Clique em "Deploy"
+
+### Deploy em outros serviços
+
+1. Construa a aplicação para produção:
+   ```
+   npm run build
+   # ou
+   pnpm build
+   # ou
+   yarn build
+   ```
+
+2. O resultado estará na pasta `.next`
+3. Configure as variáveis de ambiente no seu provedor de hospedagem
+4. Inicie o servidor:
+   ```
+   npm start
+   # ou
+   pnpm start
+   # ou
+   yarn start
+   ```
+
+## UTILIZAÇÃO DO SISTEMA
+
+1. Acesse a aplicação
+2. Crie uma conta de usuário através da página de login
+3. Após login, você será redirecionado para o dashboard
+4. No dashboard, você pode:
+   - Ver a lista de clientes
+   - Adicionar novos clientes através do botão "Novo Cliente"
+   - Editar clientes existentes através do menu de ações
+   - Excluir clientes através do menu de ações
+
+## SOLUÇÃO DE PROBLEMAS
+
+- Erro "Missing Supabase environment variables":
+  - Verifique se as variáveis de ambiente estão configuradas corretamente
+
+- Erro ao inserir/atualizar/excluir clientes:
+  - Verifique se a tabela clients foi criada corretamente
+  - Verifique se as políticas RLS estão configuradas
+
+- Problemas de login:
+  - Verifique as configurações de autenticação no painel do Supabase
+
+## SUPORTE
+
+Para suporte, entre em contato através de [seu_email@exemplo.com]

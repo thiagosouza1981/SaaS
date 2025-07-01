@@ -1,0 +1,73 @@
+# ROTEIRO PARA VÍDEO EXPLICATIVO: SISTEMA DE GERENCIAMENTO DE CLIENTES
+
+## INTRODUÇÃO (30 segundos)
+- Cumprimente os espectadores
+- Apresente-se e apresente o sistema
+- "Hoje vou mostrar como utilizar nosso Sistema de Gerenciamento de Clientes, uma solução completa para cadastrar e gerenciar informações de seus clientes de forma segura e eficiente."
+
+## VISÃO GERAL DO SISTEMA (1 minuto)
+- Explique brevemente o que o sistema faz
+- Mencione os principais recursos: autenticação, CRUD de clientes, segurança por usuário
+- "Este sistema permite que você cadastre, visualize, edite e exclua informações de clientes. Cada usuário tem acesso apenas aos seus próprios clientes, garantindo total privacidade e segurança dos dados."
+
+## CADASTRO E LOGIN (2 minutos)
+- Acesse a página inicial
+- Mostre como criar uma nova conta
+- Preencha o formulário de cadastro
+- Mostre o processo de login
+- "Vamos começar criando uma conta. Basta clicar em 'Criar conta', preencher seu e-mail e senha, e confirmar. Depois, você pode fazer login usando as mesmas credenciais."
+
+## DASHBOARD (1 minuto)
+- Explique os elementos da interface do dashboard
+- Mostre a lista de clientes (ou a mensagem de "nenhum cliente cadastrado")
+- Explique o cabeçalho e o botão de logout
+- "Após o login, você é direcionado para o dashboard. Aqui você pode ver todos os seus clientes cadastrados, adicionar novos, e gerenciar os existentes."
+
+## CADASTRANDO UM CLIENTE (2 minutos)
+- Clique no botão "Novo Cliente"
+- Explique cada campo do formulário
+- Preencha o formulário com dados de exemplo
+- Clique em "Salvar" e mostre a notificação de sucesso
+- Mostre o cliente recém-adicionado na lista
+- "Para adicionar um novo cliente, clique no botão 'Novo Cliente'. Preencha o nome, que é obrigatório, e opcionalmente o e-mail e telefone. Clique em 'Salvar' e pronto, seu cliente está cadastrado!"
+
+## EDITANDO UM CLIENTE (2 minutos)
+- Localize um cliente na lista
+- Clique no menu de ações e selecione "Editar"
+- Mostre como o formulário vem preenchido com os dados atuais
+- Faça alguma alteração nos dados
+- Clique em "Salvar" e mostre a notificação de sucesso
+- Verifique que os dados foram atualizados na lista
+- "Para editar um cliente, encontre-o na lista, clique nos três pontos à direita e selecione 'Editar'. Faça as alterações necessárias e clique em 'Salvar'."
+
+## EXCLUINDO UM CLIENTE (1 minuto)
+- Localize um cliente na lista
+- Clique no menu de ações e selecione "Excluir"
+- Mostre o diálogo de confirmação
+- Confirme a exclusão e mostre a notificação de sucesso
+- Verifique que o cliente foi removido da lista
+- "Para excluir um cliente, clique nos três pontos e selecione 'Excluir'. O sistema pedirá confirmação para evitar exclusões acidentais. Confirme, e o cliente será removido."
+
+## SEGURANÇA E PRIVACIDADE (1 minuto)
+- Explique como cada usuário só vê seus próprios clientes
+- Mencione as políticas de segurança no banco de dados
+- "Uma característica importante do sistema é que cada usuário só tem acesso aos clientes que ele mesmo cadastrou. Isso garante privacidade e segurança dos dados."
+
+## USANDO EM DISPOSITIVOS MÓVEIS (1 minuto)
+- Mostre o sistema funcionando em um dispositivo móvel (ou redimensione a janela)
+- Destaque a responsividade da interface
+- "O sistema é totalmente responsivo, funcionando perfeitamente em smartphones e tablets, permitindo que você gerencie seus clientes de qualquer lugar."
+
+## ENCERRAMENTO (30 segundos)
+- Faça um resumo dos recursos mostrados
+- Incentive o espectador a começar a usar o sistema
+- Forneça informações de contato para suporte
+- Agradeça por assistir
+- "Espero que este vídeo tenha mostrado como nosso Sistema de Gerenciamento de Clientes pode facilitar seu dia a dia. Comece a usar agora mesmo e, se tiver qualquer dúvida, entre em contato conosco. Obrigado por assistir!"
+
+## DICAS PARA GRAVAÇÃO
+- Grave em ambiente bem iluminado e silencioso
+- Use um microfone de qualidade para áudio claro
+- Mantenha um ritmo pausado, dando tempo para o espectador absorver as informações
+- Considere adicionar legendas para acessibilidade
+- Edite o vídeo para remover pausas longas ou erros
