@@ -18,6 +18,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change:", event, session);
       if (session) {
         router.push("/dashboard");
       }
@@ -31,24 +32,64 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      console.log("Tentando autenticação:", { email, isLogin });
+      
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        
+        console.log("Login response:", { data, error });
+        
+        if (error) {
+          console.error("Erro de login:", error);
+          throw error;
+        }
+        
         toast.success("Login realizado com sucesso!");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              first_name: '',
+              last_name: ''
+            }
+          }
         });
-        if (error) throw error;
-        toast.success("Conta criada com sucesso!");
+        
+        console.log("Signup response:", { data, error });
+        
+        if (error) {
+          console.error("Erro de signup:", error);
+          throw error;
+        }
+        
+        if (data.user && !data.session) {
+          toast.success("Conta criada! Verifique seu email para confirmar.");
+        } else {
+          toast.success("Conta criada com sucesso!");
+        }
       }
     } catch (error: any) {
-      console.error("Erro de autenticação:", error);
-      toast.error(error.message || "Erro na autenticação");
+      console.error("Erro de autenticação completo:", error);
+      
+      // Mensagens de erro mais específicas
+      let errorMessage = "Erro na autenticação";
+      
+      if (error.message?.includes("Invalid login credentials")) {
+        errorMessage = "Email ou senha incorretos";
+      } else if (error.message?.includes("Email not confirmed")) {
+        errorMessage = "Email não confirmado. Verifique sua caixa de entrada.";
+      } else if (error.message?.includes("User already registered")) {
+        errorMessage = "Este email já está cadastrado. Tente fazer login.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -109,6 +150,23 @@ export default function LoginPage() {
               className="text-sm"
             >
               Testar Conexão
+            </Button>
+          </div>
+          
+          {/* Botão para teste rápido */}
+          <div className="mt-4 p-3 bg-gray-100 rounded">
+            <p className="text-xs text-gray-600 mb-2">Teste rápido:</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setEmail("admin@test.com");
+                setPassword("123456");
+                setIsLogin(false);
+              }}
+              className="w-full text-xs"
+            >
+              Preencher dados de teste
             </Button>
           </div>
         </CardContent>
