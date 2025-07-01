@@ -1,6 +1,6 @@
 "use client";
 
-import { createClient } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -14,7 +14,6 @@ import { EditClientModal } from "@/components/clients/EditClientModal";
 import { DeleteClientAlert } from "@/components/clients/DeleteClientAlert";
 
 export default function DashboardPage() {
-  const supabase = createClient();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
@@ -45,24 +44,29 @@ export default function DashboardPage() {
       }
     };
     getUserAndClients();
-  }, [supabase, router]);
+  }, [router]);
 
-  // Fetch clients
+  // Fetch clients with better error handling
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const { data: clientsData, error: clientsError } = await supabase
+      const { data, error } = await supabase
         .from("clients")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (clientsError) {
-        console.error("Erro ao buscar clientes:", clientsError);
+      if (error) {
+        console.error("Erro ao buscar clientes:", error);
         setClients([]);
+        return;
+      }
+
+      // Ensure data is always an array
+      if (data && Array.isArray(data)) {
+        setClients(data);
       } else {
-        // Garantir que clientsData é um array
-        const safeClientsData = Array.isArray(clientsData) ? clientsData : [];
-        setClients(safeClientsData);
+        console.warn("Dados dos clientes não são um array:", data);
+        setClients([]);
       }
     } catch (error) {
       console.error("Erro inesperado ao buscar clientes:", error);

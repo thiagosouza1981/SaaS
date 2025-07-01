@@ -2,41 +2,37 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 // Fallback values for development (Lasy preview)
-const FALLBACK_SUPABASE_URL = "https://vdbjepvrfoiogcpfkxax.supabase.co";
-const FALLBACK_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkYmplcHZyZm9pb2djcGZreGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5MTMyMTIsImV4cCI6MjA2NjQ4OTIxMn0.cv0-ag6XFtzwHPjzOckmGwzmBERM8Dv3tyNrKenSacI";
+const FALLBACK_SUPABASE_URL = "https://zblalosogbtxhhnxosaw.supabase.co";
+const FALLBACK_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibGFsb3NvZ2J0eGhobnhvc2F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzNzQ5MTcsImV4cCI6MjA2Njk1MDkxN30.b_zvB9QC_k0hSpk-8WLsebRfDniPaXPP7gAUag2zmIA";
 
 // Environment variables (for production deployment)
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || FALLBACK_SUPABASE_ANON_KEY;
 
-// Lazy-loaded Supabase client
-let supabaseClient: SupabaseClient | null = null;
-
-function getSupabase(): SupabaseClient {
-  if (!supabaseClient) {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error(
-        'Missing Supabase environment variables. Please check your .env.local file.'
-      );
-    }
-    
-    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: typeof window !== 'undefined', // Only persist in browser
-      },
-    });
+// Create Supabase client
+function createSupabaseClient(): SupabaseClient {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error(
+      'Missing Supabase environment variables. Please check your .env.local file.'
+    );
   }
   
-  return supabaseClient;
+  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: typeof window !== 'undefined', // Only persist in browser
+    },
+  });
 }
 
-// Export both the function and a direct instance for convenience
-export const supabase = getSupabase();
-export { getSupabase };
+// Export the client creation function
+export { createSupabaseClient as createClient };
+
+// Export a default instance for convenience
+export const supabase = createSupabaseClient();
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 // or
-// import { getSupabase } from "@/integrations/supabase/client";
-// const supabase = getSupabase();
+// import { createClient } from "@/integrations/supabase/client";
+// const supabase = createClient();
