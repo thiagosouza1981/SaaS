@@ -9,16 +9,28 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ clients }: StatsCardsProps) {
-  const totalClients = clients.length;
-  const clientsWithEmail = clients.filter(client => client.email).length;
-  const clientsWithPhone = clients.filter(client => client.phone).length;
+  // Garantir que clients é sempre um array
+  const safeClients = Array.isArray(clients) ? clients : [];
+  
+  const totalClients = safeClients.length;
+  const clientsWithEmail = safeClients.filter(client => 
+    client && client.email && client.email.trim() !== ''
+  ).length;
+  const clientsWithPhone = safeClients.filter(client => 
+    client && client.phone && client.phone.trim() !== ''
+  ).length;
   
   // Clientes adicionados nos últimos 7 dias
   const lastWeek = new Date();
   lastWeek.setDate(lastWeek.getDate() - 7);
-  const recentClients = clients.filter(client => 
-    new Date(client.created_at) > lastWeek
-  ).length;
+  const recentClients = safeClients.filter(client => {
+    if (!client || !client.created_at) return false;
+    try {
+      return new Date(client.created_at) > lastWeek;
+    } catch {
+      return false;
+    }
+  }).length;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
