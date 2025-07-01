@@ -48,7 +48,15 @@ export function AddClientModal({ onClientAdded }: AddClientModalProps) {
   async function onSubmit(values: ClientFormValues) {
     setIsSubmitting(true);
     try {
+      // Obter o usuário atual
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        throw new Error("Usuário não autenticado");
+      }
+
       const { error } = await supabase.from("clients").insert({
+        user_id: user.id,
         name: values.name,
         email: values.email,
         phone: values.phone,
