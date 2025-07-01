@@ -25,7 +25,7 @@ interface ClientsTableProps {
 }
 
 export function ClientsTable({
-  clients,
+  clients = [], // Valor padrão
   onEdit,
   onDelete,
 }: ClientsTableProps) {
@@ -57,38 +57,45 @@ export function ClientsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {safeClients.map((client) => (
-            <TableRow key={client.id}>
-              <TableCell className="font-medium">{client.name}</TableCell>
-              <TableCell className="hidden sm:table-cell">
-                {client.email || "-"}
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                {client.phone || "-"}
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button aria-haspopup="true" size="icon" variant="ghost">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Toggle menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onSelect={() => onEdit(client)}>
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={() => onDelete(client)}
-                      className="text-red-600"
-                    >
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
+          {safeClients.map((client) => {
+            // Verificação adicional para cada cliente
+            if (!client || !client.id) {
+              return null;
+            }
+            
+            return (
+              <TableRow key={client.id}>
+                <TableCell className="font-medium">{client.name || "-"}</TableCell>
+                <TableCell className="hidden sm:table-cell">
+                  {client.email || "-"}
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {client.phone || "-"}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button aria-haspopup="true" size="icon" variant="ghost">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Toggle menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={() => onEdit(client)}>
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => onDelete(client)}
+                        className="text-red-600"
+                      >
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

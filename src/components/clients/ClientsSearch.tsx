@@ -10,11 +10,12 @@ interface ClientsSearchProps {
   searchQuery: string;
 }
 
-export function ClientsSearch({ onSearch, searchQuery }: ClientsSearchProps) {
-  const [localQuery, setLocalQuery] = useState(searchQuery);
+export function ClientsSearch({ onSearch, searchQuery = "" }: ClientsSearchProps) {
+  const [localQuery, setLocalQuery] = useState(searchQuery || "");
 
   const handleSearch = () => {
-    onSearch(localQuery);
+    const query = localQuery || "";
+    onSearch(query);
   };
 
   const handleClear = () => {
@@ -35,7 +36,7 @@ export function ClientsSearch({ onSearch, searchQuery }: ClientsSearchProps) {
         <Input
           placeholder="Buscar por nome, email ou telefone..."
           value={localQuery}
-          onChange={(e) => setLocalQuery(e.target.value)}
+          onChange={(e) => setLocalQuery(e.target.value || "")}
           onKeyPress={handleKeyPress}
           className="pl-10"
         />

@@ -57,15 +57,29 @@ export default function DashboardPage() {
         .select("*")
         .order("created_at", { ascending: false });
 
+      console.log("Supabase response:", { data, error });
+
       if (error) {
         console.error("Erro ao buscar clientes:", error);
         setClients([]);
         return;
       }
 
-      // Garantir que data é sempre um array
-      const clientsData = Array.isArray(data) ? data : [];
-      setClients(clientsData);
+      // Garantir que data é sempre um array válido
+      if (!data) {
+        console.log("Data is null, setting empty array");
+        setClients([]);
+        return;
+      }
+
+      if (!Array.isArray(data)) {
+        console.log("Data is not array, setting empty array");
+        setClients([]);
+        return;
+      }
+
+      console.log("Setting clients:", data);
+      setClients(data);
     } catch (error) {
       console.error("Erro inesperado ao buscar clientes:", error);
       setClients([]);
@@ -95,25 +109,38 @@ export default function DashboardPage() {
   };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
+    setSearchQuery(query || "");
   };
 
-  // Garantir que clients é sempre um array antes de filtrar
+  // Garantir que clients é sempre um array antes de qualquer operação
   const safeClients = Array.isArray(clients) ? clients : [];
+  console.log("Safe clients:", safeClients);
   
-  // Filtrar clientes baseado na busca
-  const filteredClients = safeClients.filter(client => {
-    if (!client || typeof client !== 'object') return false;
-    
-    const name = client.name || '';
-    const email = client.email || '';
-    const phone = client.phone || '';
-    const query = searchQuery.toLowerCase();
-    
-    return name.toLowerCase().includes(query) ||
-           email.toLowerCase().includes(query) ||
-           phone.includes(query);
-  });
+  // Filtrar clientes baseado na busca com verificações extras
+  let filteredClients: Client[] = [];
+  try {
+    if (searchQuery && searchQuery.trim() !== "") {
+      filteredClients = safeClients.filter(client => {
+        if (!client || typeof client !== 'object') return false;
+        
+        const name = String(client.name || '').toLowerCase();
+        const email = String(client.email || '').toLowerCase();
+        const phone = String(client.phone || '');
+        const query = String(searchQuery || '').toLowerCase();
+        
+        return name.includes(query) ||
+               email.includes(query) ||
+               phone.includes(query);
+      });
+    } else {
+      filteredClients = safeClients;
+    }
+  } catch (error) {
+    console.error("Erro ao filtrar clientes:", error);
+    filteredClients = safeClients;
+  }
+
+  console.log("Filtered clients:", filteredClients);
 
   if (!user) {
     return (
