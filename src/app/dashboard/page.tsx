@@ -12,13 +12,19 @@ import { ClientsTable } from "@/components/clients/ClientsTable";
 import { AddClientModal } from "@/components/clients/AddClientModal";
 import { EditClientModal } from "@/components/clients/EditClientModal";
 import { DeleteClientAlert } from "@/components/clients/DeleteClientAlert";
+import { ClientsSearch } from "@/components/clients/ClientsSearch";
+import { StatsCards } from "@/components/dashboard/StatsCards";
+import { ExportClients } from "@/components/clients/ExportClients";
+import { Settings, User as UserIcon } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string>('user');
+  const [searchQuery, setSearchQuery] = useState("");
   
   // CRUD state
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
@@ -65,6 +71,20 @@ export default function DashboardPage() {
     };
     getUserAndClients();
   }, [router]);
+
+  // Filter clients based on search
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredClients(clients);
+    } else {
+      const filtered = clients.filter(client =>
+        client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (client.phone && client.phone.includes(searchQuery))
+      );
+      setFilteredClients(filtered);
+    }
+  }, [clients, searchQuery]);
 
   // Fetch clients with better error handling
   const fetchClients = async () => {
@@ -127,6 +147,11 @@ export default function DashboardPage() {
     setIsDeleteAlertOpen(true);
   };
 
+  // Handle search
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -156,6 +181,22 @@ export default function DashboardPage() {
               {user.email}
             </span>
             <Button
+              variant="outline"
+              size="icon"
+              onClick={() => router.push("/profile")}
+            >
+              <UserIcon className="h-4 w-4" />
+            </Button>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => router.push("/admin")}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
               onClick={handleSignOut}
               variant="outline"
             >
@@ -177,10 +218,21 @@ export default function DashboardPage() {
             </div>
           )}
           
-          <div className="flex justify-end mb-4">
-            <AddClientModal onClientAdded={fetchClients} />
+          {/* Estatísticas */}
+          <StatsCards clients={clients} />
+          
+          {/* Ações e busca */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div className="flex gap-2">
+              <AddClientModal onClientAdded={fetchClients} />
+              <ExportClients clients={filteredClients} />
+            </div>
           </div>
           
+          {/* Busca */}
+          <ClientsSearch onSearch={handleSearch} searchQuery={searchQuery} />
+          
+          {/* Tabela */}
           {loading ? (
             <div className="space-y-2">
               <Skeleton className="h-12 w-full" />
@@ -189,10 +241,17 @@ export default function DashboardPage() {
             </div>
           ) : (
             <ClientsTable 
-              clients={clients} 
+              clients={filteredClients} 
               onEdit={handleEditClient} 
               onDelete={handleDeleteClient} 
             />
+          )}
+          
+          {/* Resultados da busca */}
+          {searchQuery && (
+            <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+              Mostrando {filteredClients.length} de {clients.length} clientes
+            </div>
           )}
         </div>
       </main>
