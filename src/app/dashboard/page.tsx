@@ -100,16 +100,27 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
         <p>Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* 🌙 BANNER DARK MODE - INDICADOR VISUAL */}
+      <div className="bg-purple-900 border-l-4 border-purple-400 text-purple-100 p-4">
+        <div className="flex">
+          <div className="ml-3">
+            <p className="text-sm">
+              🌙 <strong>TEMA DARK ATIVO!</strong> Se você vê esta mensagem roxa, as mudanças estão funcionando!
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* 🎉 BANNER DE SUCESSO */}
-      <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4">
+      <div className="bg-green-900 border-l-4 border-green-400 text-green-100 p-4">
         <div className="flex">
           <div className="ml-3">
             <p className="text-sm">
@@ -119,16 +130,16 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <header className="bg-white border-b">
+      <header className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            🎯 Dashboard Atualizado - Meus Clientes
+          <h1 className="text-2xl font-bold text-white">
+            🌙 Dashboard DARK MODE - Meus Clientes
           </h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 hidden sm:block">
+            <span className="text-sm text-gray-300 hidden sm:block">
               {user.email}
             </span>
-            <Button onClick={handleSignOut} variant="outline">
+            <Button onClick={handleSignOut} variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
               Sair
             </Button>
           </div>
@@ -138,64 +149,64 @@ export default function DashboardPage() {
       <main>
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           
-          {/* 📊 ESTATÍSTICAS SIMPLES */}
+          {/* 📊 ESTATÍSTICAS DARK */}
           <div className="grid gap-4 md:grid-cols-3 mb-6">
-            <Card className="bg-blue-50">
+            <Card className="bg-blue-900 border-blue-700">
               <CardHeader>
-                <CardTitle className="text-blue-800">Total de Clientes</CardTitle>
+                <CardTitle className="text-blue-200">Total de Clientes</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-blue-600">{clients.length}</div>
+                <div className="text-3xl font-bold text-blue-100">{clients.length}</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-green-50">
+            <Card className="bg-green-900 border-green-700">
               <CardHeader>
-                <CardTitle className="text-green-800">Com Email</CardTitle>
+                <CardTitle className="text-green-200">Com Email</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-3xl font-bold text-green-100">
                   {clients.filter(c => c.email).length}
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-purple-50">
+            <Card className="bg-purple-900 border-purple-700">
               <CardHeader>
-                <CardTitle className="text-purple-800">Com Telefone</CardTitle>
+                <CardTitle className="text-purple-200">Com Telefone</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-purple-600">
+                <div className="text-3xl font-bold text-purple-100">
                   {clients.filter(c => c.phone).length}
                 </div>
               </CardContent>
             </Card>
           </div>
           
-          {/* 🔍 BUSCA SIMPLES */}
+          {/* 🔍 BUSCA DARK */}
           <div className="mb-4">
             <Input
-              placeholder="🔍 Buscar clientes por nome, email ou telefone..."
+              placeholder="🌙 Buscar clientes no modo dark..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-md"
+              className="max-w-md bg-gray-800 border-gray-600 text-white placeholder-gray-400"
             />
           </div>
           
-          {/* 🔧 AÇÕES */}
+          {/* 🔧 AÇÕES DARK */}
           <div className="flex gap-2 mb-4">
             <AddClientModal onClientAdded={fetchClients} />
-            <Button variant="outline">
-              📤 Exportar ({filteredClients.length} clientes)
+            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
+              🌙 Exportar ({filteredClients.length} clientes)
             </Button>
           </div>
           
           {/* 📋 TABELA */}
           {loading ? (
             <div className="space-y-2">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full bg-gray-800" />
+              <Skeleton className="h-12 w-full bg-gray-800" />
+              <Skeleton className="h-12 w-full bg-gray-800" />
             </div>
           ) : (
             <ClientsTable 
@@ -205,11 +216,11 @@ export default function DashboardPage() {
             />
           )}
           
-          {/* 📊 RESULTADOS */}
+          {/* 📊 RESULTADOS DARK */}
           {searchQuery && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <p className="text-yellow-800">
-                🔍 Mostrando {filteredClients.length} de {clients.length} clientes
+            <div className="mt-4 p-3 bg-yellow-900 border border-yellow-600 rounded">
+              <p className="text-yellow-200">
+                🌙 Mostrando {filteredClients.length} de {clients.length} clientes
               </p>
             </div>
           )}
