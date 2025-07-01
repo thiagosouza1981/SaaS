@@ -1,9 +1,21 @@
 {
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
   "git": {
     "deploymentEnabled": true
   },
   "github": {
     "enabled": true,
     "silent": true
+  },
+  "functions": {
+    "app/**": {
+      "includeFiles": "**"
+    }
   }
 }

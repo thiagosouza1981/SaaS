@@ -1,8 +1,7 @@
-supabase/
+.git
+node_modules
+.next
 .env.local
-.env.development
-.env.test
-.git/
-node_modules/
+.env
 *.log
-.DS_Store 
+.DS_Store
