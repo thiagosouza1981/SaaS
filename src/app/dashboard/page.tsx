@@ -4,22 +4,41 @@ import { createClient } from "@/integrations/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { Button } from "@/components/ui/button";
+import { ClientsTable } from "@/components/clients/ClientsTable";
+import { Client } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
   const supabase = createClient();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data.user) {
+    const getUserAndClients = async () => {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
         router.push("/login");
-      } else {
-        setUser(data.user);
+        return;
       }
+      setUser(user);
+
+      const { data: clientsData, error: clientsError } = await supabase
+        .from("clients")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (clientsError) {
+        console.error("Erro ao buscar clientes:", clientsError);
+      } else {
+        setClients(clientsData || []);
+      }
+      setLoading(false);
     };
-    getUser();
+    getUserAndClients();
   }, [supabase, router]);
 
   const handleSignOut = async () => {
@@ -36,28 +55,37 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <button
-            onClick={handleSignOut}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-          >
-            Sair
-          </button>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white dark:bg-gray-900 border-b">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Meus Clientes
+          </h1>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 dark:text-gray-300 hidden sm:block">{user.email}</span>
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+            >
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
       <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 p-4 text-center">
-              <h2 className="text-xl font-semibold">Bem-vindo, {user.email}</h2>
-              <p className="mt-2 text-gray-600">
-                Aqui você poderá gerenciar seus clientes.
-              </p>
-            </div>
+          <div className="flex justify-end mb-4">
+            <Button>Novo Cliente</Button>
           </div>
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ) : (
+            <ClientsTable clients={clients} onEdit={() => {}} onDelete={() => {}} />
+          )}
         </div>
       </main>
     </div>
