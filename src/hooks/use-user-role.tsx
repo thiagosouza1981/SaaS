@@ -17,13 +17,18 @@ export function useUserRole() {
           return;
         }
 
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
           .single();
 
-        setUserRole(profile?.role || 'user');
+        if (error) {
+          console.log('Erro ao buscar profile, usando role padrão:', error);
+          setUserRole('user');
+        } else {
+          setUserRole(profile?.role || 'user');
+        }
       } catch (error) {
         console.error('Erro ao buscar role do usuário:', error);
         setUserRole('user');

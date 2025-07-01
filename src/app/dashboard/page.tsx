@@ -5,23 +5,20 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { Client } from "@/types";
-import { useUserRole } from "@/hooks/use-user-role";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { ClientsTable } from "@/components/clients/ClientsTable";
 import { AddClientModal } from "@/components/clients/AddClientModal";
 import { EditClientModal } from "@/components/clients/EditClientModal";
 import { DeleteClientAlert } from "@/components/clients/DeleteClientAlert";
-import { Shield } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { userRole, isAdmin, loading: roleLoading } = useUserRole();
   const [user, setUser] = useState<User | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string>('user');
   
   // CRUD state
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
@@ -33,13 +30,32 @@ export default function DashboardPage() {
   useEffect(() => {
     const getUserAndClients = async () => {
       try {
+        console.log("Buscando usuário...");
         const { data: { user }, error: userError } = await supabase.auth.getUser();
 
         if (userError || !user) {
+          console.log("Usuário não encontrado, redirecionando para login");
           router.push("/login");
           return;
         }
+        
+        console.log("Usuário encontrado:", user.email);
         setUser(user);
+
+        // Buscar role do usuário
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          setUserRole(profile?.role || 'user');
+          console.log("Role do usuário:", profile?.role || 'user');
+        } catch (roleError) {
+          console.log("Erro ao buscar role, usando 'user' como padrão:", roleError);
+          setUserRole('user');
+        }
 
         await fetchClients();
       } catch (error) {
@@ -54,10 +70,14 @@ export default function DashboardPage() {
   const fetchClients = async () => {
     setLoading(true);
     try {
+      console.log("Buscando clientes...");
       const { data, error } = await supabase
         .from("clients")
         .select("*")
         .order("created_at", { ascending: false });
+
+      console.log("Resposta do Supabase - data:", data);
+      console.log("Resposta do Supabase - error:", error);
 
       if (error) {
         console.error("Erro ao buscar clientes:", error);
@@ -65,11 +85,15 @@ export default function DashboardPage() {
         return;
       }
 
-      // Ensure data is always an array
-      if (data && Array.isArray(data)) {
+      // Verificação robusta dos dados
+      if (data === null || data === undefined) {
+        console.log("Dados são null/undefined, definindo array vazio");
+        setClients([]);
+      } else if (Array.isArray(data)) {
+        console.log("Dados são array válido com", data.length, "itens");
         setClients(data);
       } else {
-        console.warn("Dados dos clientes não são um array:", data);
+        console.warn("Dados não são um array:", typeof data, data);
         setClients([]);
       }
     } catch (error) {
@@ -103,13 +127,15 @@ export default function DashboardPage() {
     setIsDeleteAlertOpen(true);
   };
 
-  if (!user || roleLoading) {
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p>Carregando...</p>
       </div>
     );
   }
+
+  const isAdmin = userRole === 'admin';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -120,10 +146,9 @@ export default function DashboardPage() {
               {isAdmin ? "Painel Administrativo" : "Meus Clientes"}
             </h1>
             {isAdmin && (
-              <Badge variant="destructive" className="flex items-center gap-1">
-                <Shield className="h-3 w-3" />
+              <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded">
                 Admin
-              </Badge>
+              </span>
             )}
           </div>
           <div className="flex items-center gap-4">

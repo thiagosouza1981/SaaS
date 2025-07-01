@@ -29,8 +29,11 @@ export function ClientsTable({
   onEdit,
   onDelete,
 }: ClientsTableProps) {
-  // Garantir que clients é sempre um array
+  // Garantir que clients é sempre um array válido
   const safeClients = Array.isArray(clients) ? clients : [];
+
+  console.log("ClientsTable - clients recebidos:", clients);
+  console.log("ClientsTable - safeClients:", safeClients);
 
   if (safeClients.length === 0) {
     return (

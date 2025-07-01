@@ -9,20 +9,23 @@ const FALLBACK_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3M
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || FALLBACK_SUPABASE_ANON_KEY;
 
-// Create Supabase client
+// Create Supabase client with error handling
 function createSupabaseClient(): SupabaseClient {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    throw new Error(
-      'Missing Supabase environment variables. Please check your .env.local file.'
-    );
+  try {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    
+    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: typeof window !== 'undefined',
+      },
+    });
+  } catch (error) {
+    console.error('Erro ao criar cliente Supabase:', error);
+    throw error;
   }
-  
-  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: typeof window !== 'undefined', // Only persist in browser
-    },
-  });
 }
 
 // Export the client creation function
@@ -30,9 +33,3 @@ export { createSupabaseClient as createClient };
 
 // Export a default instance for convenience
 export const supabase = createSupabaseClient();
-
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-// or
-// import { createClient } from "@/integrations/supabase/client";
-// const supabase = createClient();
